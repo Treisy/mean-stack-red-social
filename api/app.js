@@ -5,6 +5,8 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // Cargar rutas
+var userRouters = require('./routes/user');
+
 
 
 // Cargar Midlewares
@@ -16,11 +18,6 @@ app.use(bodyParser.json());
 
 
 // Rutas
-app.get('/pruebas', (req, res) => {
-    res.status(200).send({
-        message: 'Acción de prueba'
-    })
-});
-
+app.use('/api', userRouters);
 
 module.exports = app;
