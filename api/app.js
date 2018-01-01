@@ -17,9 +17,9 @@ app.use(bodyParser.json());
 
 // Rutas
 app.get('/pruebas', (req, res) => {
-   res.status(200).send({
-    message: 'Acción de prueba'
-})
+    res.status(200).send({
+        message: 'Acción de prueba'
+    })
 });
 
 
