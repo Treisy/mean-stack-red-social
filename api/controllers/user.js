@@ -66,8 +66,33 @@ function saveUser(request, response) {
     }
 }
 
+function loginUser(request, response) {
+    var params = request.body;
+    var email = params.email,
+        password = params.password;
+
+    User.findOne({ email: email }, (err, user) => {
+        if(err) return response.status(500).send({ message: 'Error en la petición' });
+
+        if(user) {
+            bcrypt.compare(password, user.password, (err, check) => {
+                if(check) {
+                    //Devolver datos
+                    user.password = undefined;
+                    return response.status(200).send({ user });
+                } else {
+                    return response.status(404).send({ message: 'El usuario no se ha podido identificar' });
+                }
+            });
+        }  else {
+            return response.status(404).send({ message: 'El usuario no se ha podido identificar!!' });
+        }
+    });
+}
+
 module.exports = {
     home,
     pruebas,
-    saveUser
+    saveUser,
+    loginUser
 };
