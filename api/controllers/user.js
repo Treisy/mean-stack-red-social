@@ -30,19 +30,34 @@ function saveUser(request, response) {
         user.role = 'ROLE_USER';
         user.image = null;
 
-        bcrypt.hash(params.password, null, null, (err, hash) => {
-            user.password = hash;
 
-            user.save((err, userStored) => {
-                if(err) return response.status(500).send({message: 'Error al guardar usuario'});
+        //Avoid duplicate users
+        User.find({ $or: [
+                { email: user.email.toLowerCase()},
+                { nick: user.nick.toLowerCase()}
+            ]}).exec((err, users) => {
+                if(err) return response.status(500).send({ message: 'Error en la petición de usuarios'});
 
-                if(userStored) {
-                    response.status(200).send({user: userStored});
+                if(users && users.length >= 1) {
+                    return response.status(200).send({ message: 'El usuario que intentas registrar ya existe'});
                 } else {
-                    response.status(404).send({message: 'No se ha registrado el usuario' });
+
+                    bcrypt.hash(params.password, null, null, (err, hash) => {
+                        user.password = hash;
+
+                        user.save((err, userStored) => {
+                            if(err) return response.status(500).send({message: 'Error al guardar usuario'});
+
+                            if(userStored) {
+                                response.status(200).send({user: userStored});
+                            } else {
+                                response.status(404).send({message: 'No se ha registrado el usuario' });
+                            }
+                        });
+                    });
                 }
-            });
         });
+
 
     } else {
         response.status(200).send({
